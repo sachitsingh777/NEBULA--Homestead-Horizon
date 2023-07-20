@@ -13,9 +13,3 @@ class User:
 
 
 
-# class User:
-#     def __init__(self,name,hostStatus,location,propertyType,about,hostingSince):
-#         self.name = username
-#         self.hostStatus = email
-#         self.location = password
-#         self.role = role
