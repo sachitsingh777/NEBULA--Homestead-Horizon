@@ -1,11 +1,10 @@
 from flask import Blueprint, request, jsonify
 from models.Host_model import Host 
 from bson import ObjectId
- # Assuming you have created the Host model
 import bcrypt
 import jwt
 import datetime
-from config.app_config import get_hosts_collection  # Update this to get the Hosts collection
+from config.app_config import get_hosts_collection
 
 hosts_collection = get_hosts_collection()
 hosts_Detail = Blueprint("hosts", __name__)
@@ -61,7 +60,7 @@ def login_host():
             "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         # Replace this with a strong secret key for production use
-        secret_key = "homestead"
+        secret_key = "your_secret_key"
         token = jwt.encode(payload, secret_key, algorithm="HS256")
 
         return jsonify({"message": "Login successful", "token": token, "name": host_data["name"]}), 200
@@ -70,7 +69,7 @@ def login_host():
         return jsonify({"message": "Invalid email or password"}), 401
 
 
-@hosts_Detail.route("/", methods=["GET"])
+@hosts_Detail.route("/api/hosts", methods=["GET"])
 def get_all_hosts():
     # Retrieve all hosts from the MongoDB collection
     all_hosts = hosts_collection.find()
@@ -109,7 +108,6 @@ def get_host_by_id(host_id):
         return jsonify(host), 200
     else:
         return jsonify({"message": "Host not found"}), 404
-
 
 
 @hosts_Detail.route("/api/hosts/<string:host_id>", methods=["PUT"])
