@@ -51,20 +51,20 @@ def get_all_bookings():
 @bookings_route.route("/bookings/<string:booking_id>", methods=["GET"])
 def get_booking_by_id(booking_id):
     # Retrieve the booking document from the database based on the booking_id (Replace `bookings_collection` with your MongoDB collection)
-    # booking_data = bookings_collection.find_one({"_id": ObjectId(booking_id)})
+    booking_data = bookings_collection.find_one({"_id": ObjectId(booking_id)})
     
-    # if booking_data:
-    #     booking_obj = {
-    #         "id": str(booking_data["_id"]),
-    #         "property_id": booking_data["property_id"],
-    #         "guest_id": booking_data["guest_id"],
-    #         "check_in": booking_data["check_in"],
-    #         "check_out": booking_data["check_out"],
-    #         "total_price": booking_data["total_price"]
-    #     }
-    #     return jsonify(booking_obj), 200
-    # else:
-    #     return jsonify({"message": "Booking not found"}), 404
+    if booking_data:
+        booking_obj = {
+            "id": str(booking_data["_id"]),
+            "property_id": booking_data["property_id"],
+            "guest_id": booking_data["guest_id"],
+            "check_in": booking_data["check_in"],
+            "check_out": booking_data["check_out"],
+            "total_price": booking_data["total_price"]
+        }
+        return jsonify(booking_obj), 200
+    else:
+        return jsonify({"message": "Booking not found"}), 404
 
     # Replace the return statement with appropriate responses
     return jsonify({"message": "Booking not found"}), 404
