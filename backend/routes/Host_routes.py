@@ -49,10 +49,9 @@ def login_host():
         return jsonify({"message": "Invalid email or password"}), 401
 
     # Retrieve the hashed password from the host document
-    hashed_password = host_data["password"].encode("utf-8")
+    hashed_password = host_data.get("password")
 
-    # Verify the password using bcrypt
-    if bcrypt.checkpw(password.encode("utf-8"), hashed_password):
+    if hashed_password and bcrypt.checkpw(password.encode(), hashed_password):
         # Create a JWT token for authentication
         payload = {
             "host_id": str(host_data["_id"]),

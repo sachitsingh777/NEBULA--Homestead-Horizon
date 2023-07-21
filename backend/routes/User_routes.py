@@ -54,11 +54,13 @@ def login_user():
         return jsonify({"message": "Invalid email or password"}), 401
 
     # Retrieve the hashed password from the user document
-    hashed_password = user_data["password"].encode("utf-8")
+    # hashed_password = user_data["password"].encode("utf-8")
+    # print(hashed_password)
+    # # Verify the password using bcrypt
+    # if bcrypt.checkpw(password.encode("utf-8"), hashed_password):
+    hashed_password = user_data.get("password")
 
-    # Verify the password using bcrypt
-    if bcrypt.checkpw(password.encode("utf-8"), hashed_password):
-
+    if hashed_password and bcrypt.checkpw(password.encode(), hashed_password):
         # Create a JWT token for authentication
         payload = {
             "user_id": str(user_data["_id"]),
