@@ -9,7 +9,7 @@ import os
 PORT = os.getenv("PORT")
 app = Flask(__name__)
 CORS(app, origins='*')
-app = Flask(__name__)
+
 
 app.register_blueprint(users_Detail, url_prefix="/users")
 app.register_blueprint(hosts_Detail, url_prefix="/hosts")

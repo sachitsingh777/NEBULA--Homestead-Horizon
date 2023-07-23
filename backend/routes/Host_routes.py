@@ -9,49 +9,54 @@ from config.app_config import get_hosts_collection
 hosts_collection = get_hosts_collection()
 hosts_Detail = Blueprint("hosts", __name__)
 
-# Create a new host
+
+
 @hosts_Detail.route("/register", methods=["POST"])
-def register_host():
+def register_user():
     data = request.get_json()
     name = data.get("name")
-    hostStatus = data.get("hostStatus")
-    location = data.get("location")
-    propertyType = data.get("propertyType")
-    about = data.get("about")
-    hostingSince = data.get("hostingSince")
+    email = data.get("email")
+    password = data.get("password")
+    image=data.get("image")
 
-    # Create a new Host instance
-    new_host = Host(name, hostStatus, location, propertyType, about, hostingSince)
 
+    # Hash the password using bcrypt
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+    # Create a new User instance with the hashed password
+    new_host = Host(name, email, hashed_password,image)
     if new_host.is_valid():
-        # Insert the new host into the database
-        result = hosts_collection.insert_one(new_host.to_dict())
+        # Insert the new user into the database
+        result = hosts_collection.insert_one(new_host.__dict__)
 
         if result.inserted_id:
             return jsonify({"message": "Host registered successfully!"}), 201
         else:
-            return jsonify({"message": "Failed to register host."}), 500
+            return jsonify({"message": "Failed to register Host."}), 500
     else:
-        return jsonify({"message": "Fill all the details"}), 401
+            return jsonify({"message": "Fill all the details"}), 401
 
 
-# Host login (assuming login functionality for hosts)
+
+
+
 @hosts_Detail.route("/login", methods=["POST"])
-def login_host():
+def login_user():
     data = request.get_json()
-    email = data.get("email")  # Update this to the correct field for host's email (if applicable)
-    password = data.get("password")  # Update this to the correct field for host's password (if applicable)
+    email = data.get("email")
+    password = data.get("password")
 
-    # Retrieve the host document from the database based on the email
-    host_data = hosts_collection.find_one({"email": email})  # Update this to the correct query based on your MongoDB schema
+    # Retrieve the user document from the database based on the email
+    host_data = hosts_collection.find_one({"email": email})
 
     if host_data is None:
         return jsonify({"message": "Invalid email or password"}), 401
 
-    # Retrieve the hashed password from the host document
+    # Retrieve the hashed password from the user document
+   
     hashed_password = host_data.get("password")
 
-    if hashed_password and bcrypt.checkpw(password.encode(), hashed_password):
+    if hashed_password and bcrypt.checkpw(password.encode("UTF-8"), hashed_password):
         # Create a JWT token for authentication
         payload = {
             "host_id": str(host_data["_id"]),
@@ -62,12 +67,11 @@ def login_host():
         secret_key = "your_secret_key"
         token = jwt.encode(payload, secret_key, algorithm="HS256")
 
-        return jsonify({"message": "Login successful", "token": token, "name": host_data["name"]}), 200
+        return jsonify({"message": "Login successful", "token": token, "name": host_data["name"],"host_id": str(host_data["_id"])}), 200
 
     else:
         return jsonify({"message": "Invalid email or password"}), 401
-
-
+# Get all hosts
 @hosts_Detail.route("/api/hosts", methods=["GET"])
 def get_all_hosts():
     # Retrieve all hosts from the MongoDB collection
@@ -79,16 +83,14 @@ def get_all_hosts():
         hosts_list.append({
             "id": str(host_data["_id"]),         # Convert the ObjectId to a string
             "name": host_data["name"],
-            "hostStatus": host_data["hostStatus"],
-            "location": host_data["location"],
-            "propertyType": host_data["propertyType"],
-            "about": host_data["about"],
-            "hostingSince": host_data["hostingSince"]
+            "email": host_data["email"],
+            "image": host_data["image"]
         })
 
     return jsonify(hosts_list), 200
 
 
+# Get a host by ID
 @hosts_Detail.route("/api/hosts/<string:host_id>", methods=["GET"])
 def get_host_by_id(host_id):
     # Retrieve the host document from the database based on the host_id
@@ -98,28 +100,24 @@ def get_host_by_id(host_id):
         host = {
             "id": str(host_data["_id"]),
             "name": host_data["name"],
-            "hostStatus": host_data["hostStatus"],
-            "location": host_data["location"],
-            "propertyType": host_data["propertyType"],
-            "about": host_data["about"],
-            "hostingSince": host_data["hostingSince"]
+            "email": host_data["email"],
+            "image": host_data["image"]
         }
         return jsonify(host), 200
     else:
         return jsonify({"message": "Host not found"}), 404
 
 
+# Update a host by ID
 @hosts_Detail.route("/api/hosts/<string:host_id>", methods=["PUT"])
 def update_host(host_id):
     data = request.get_json()
     name = data.get("name")
-    hostStatus = data.get("hostStatus")
-    location = data.get("location")
-    propertyType = data.get("propertyType")
-    about = data.get("about")
-    hostingSince = data.get("hostingSince")
+    email = data.get("email")
+    password = data.get("password")
+    image = data.get("image")
 
-    updated_host = Host(name, hostStatus, location, propertyType, about, hostingSince)
+    updated_host = Host(name, email, password, image)
 
     if updated_host.is_valid():
         # Update the host document in the database based on the host_id
@@ -133,6 +131,7 @@ def update_host(host_id):
         return jsonify({"message": "Fill all the details"}), 401
 
 
+# Delete a host by ID
 @hosts_Detail.route("/api/hosts/<string:host_id>", methods=["DELETE"])
 def delete_host(host_id):
     # Delete the host document from the database based on the host_id
@@ -142,3 +141,6 @@ def delete_host(host_id):
         return jsonify({"message": "Host deleted successfully!"}), 200
     else:
         return jsonify({"message": "Host not found"}), 404
+
+
+# Add the hosts Blueprint to the app

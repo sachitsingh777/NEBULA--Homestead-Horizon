@@ -4,6 +4,9 @@ from bson import ObjectId
 import bcrypt
 import jwt
 import datetime
+from config.app_config import get_hosts_collection
+
+guests_collection = get_hosts_collection()
 guests_route = Blueprint("guests", __name__)
 
 # Create a new guest
@@ -27,17 +30,17 @@ def create_guest():
 @guests_route.route("/guests", methods=["GET"])
 def get_all_guests():
     # Retrieve all guests from the database (Replace `guests_collection` with your MongoDB collection)
-    # all_guests = guests_collection.find()
+    all_guests = guests_collection.find()
     
     # Convert the MongoDB documents to a list of dictionaries
     guests_list = []
-    # for guest_data in all_guests:
-    #     guests_list.append({
-    #         "id": str(guest_data["_id"]),
-    #         "name": guest_data["name"],
-    #         "email": guest_data["email"],
-    #         "phone": guest_data["phone"]
-    #     })
+    for guest_data in all_guests:
+        guests_list.append({
+            "id": str(guest_data["_id"]),
+            "name": guest_data["name"],
+            "email": guest_data["email"],
+            "phone": guest_data["phone"]
+        })
     
     # Replace the return statement with appropriate responses
     return jsonify(guests_list), 200
@@ -47,18 +50,18 @@ def get_all_guests():
 @guests_route.route("/guests/<string:guest_id>", methods=["GET"])
 def get_guest_by_id(guest_id):
     # Retrieve the guest document from the database based on the guest_id (Replace `guests_collection` with your MongoDB collection)
-    # guest_data = guests_collection.find_one({"_id": ObjectId(guest_id)})
+    guest_data = guests_collection.find_one({"_id": ObjectId(guest_id)})
     
-    # if guest_data:
-    #     guest_obj = {
-    #         "id": str(guest_data["_id"]),
-    #         "name": guest_data["name"],
-    #         "email": guest_data["email"],
-    #         "phone": guest_data["phone"]
-    #     }
-    #     return jsonify(guest_obj), 200
-    # else:
-    #     return jsonify({"message": "Guest not found"}), 404
+    if guest_data:
+        guest_obj = {
+            "id": str(guest_data["_id"]),
+            "name": guest_data["name"],
+            "email": guest_data["email"],
+            "phone": guest_data["phone"]
+        }
+        return jsonify(guest_obj), 200
+    else:
+        return jsonify({"message": "Guest not found"}), 404
 
     # Replace the return statement with appropriate responses
     return jsonify({"message": "Guest not found"}), 404

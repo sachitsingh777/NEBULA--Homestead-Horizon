@@ -1,19 +1,20 @@
 class Host:
-    def __init__(self, name, hostStatus, location, propertyType, about, hostingSince):
+    def __init__(self, name, email, password, image):
         self.name = name
-        self.hostStatus = hostStatus
-        self.location = location
-        self.propertyType = propertyType
-        self.about = about
-        self.hostingSince = hostingSince
+        self.email = email
+        self.password = password
+        self.image = image
 
     def to_dict(self):
-       
         return {
             "name": self.name,
-            "hostStatus": self.hostStatus,
-            "location": self.location,
-            "propertyType": self.propertyType,
-            "about": self.about,
-            "hostingSince": self.hostingSince
+            "email": self.email,
+            "password": self.password,
+            "image": self.image
         }
+
+    def is_valid(self):
+        # Check if all required fields are filled
+        if not self.name or not self.email or not self.password or not self.image:
+            return False
+        return True
