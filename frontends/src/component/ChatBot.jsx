@@ -4,7 +4,7 @@ import axios from "axios";
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody } from "@chakra-ui/react";
 
 
-export const CineBot = () => {
+export const ChatBot = () => {
     const inputRef = useRef(null);
     const chatContainerRef = useRef(null);
     const [input, setInput] = useState("");
