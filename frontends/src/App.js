@@ -12,6 +12,7 @@ import Loader from './component/Loader';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import Filter from './component/Filter';
+import { ChatBot } from './component/ChatBot';
 // Main App component
 function App() {
   const [showLoader, setShowLoader] = useState(true);
@@ -31,6 +32,7 @@ function App() {
         <div className="App">
           <Navbar />
           <AllRoutes />
+          <ChatBot/>
       
         </div>
       )}
